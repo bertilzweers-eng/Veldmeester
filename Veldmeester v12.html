@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VeldMeester - Live Wedstrijd & Coaching</title>
+<meta name="theme-color" content="#1C2826">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+lichtgrijs: '#F3F4F6',
+oranje: '#D9531E',
+groen: '#1C2826',
+staalblauw: '#1B365D',
+}
+}
+}
+};
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #F3F4F6; color: #1F2937; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-oranje selection:text-white">
+
+<!-- Header -->
+<header class="bg-groen text-white px-5 py-4 sticky top-0 z-40 flex items-center justify-between shadow-sm">
+<div id="header-brand-btn" class="flex items-center space-x-3 cursor-pointer">
+<div class="w-9 h-9 rounded-xl bg-oranje flex items-center justify-center shadow-md font-bold text-lg text-white">⚽</div>
+<div>
+<h1 class="font-bold text-base tracking-tight text-white leading-tight">VeldMeester</h1>
+<p id="header-phase-badge" class="text-xs text-lichtgrijs/80 font-medium">Fase 1 · Najaar</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<button id="mute-btn" class="p-2 rounded-xl bg-white/10 text-lichtgrijs hover:bg-white/25 transition text-sm flex items-center justify-center" title="Geluid aan/uit">
+<span id="mute-icon">🔔</span>
+</button>
+</div>
+</header>
+
+<!-- Main Container -->
+<main class="flex-1 max-w-md w-full mx-auto p-4 pb-28 space-y-4">
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="space-y-4">
+<div class="bg-white rounded-2xl border border-slate-200/85 p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<span class="px-3 py-1 rounded-full bg-oranje/10 text-oranje text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5">
+<span class="w-2 h-2 rounded-full bg-oranje animate-pulse"></span>
+<span id="dash-match-status-text">Klaar voor aftrap</span>
+</span>
+<span id="dash-phase-name" class="text-xs text-slate-500 font-semibold">Fase 1</span>
+</div>
+<div class="flex items-center justify-between py-2">
+<div class="text-center flex-1">
+<h3 id="dash-team-home" class="font-bold text-sm truncate text-slate-900">Mijn Team</h3>
+<p class="text-[11px] text-slate-500">Thuis</p>
+</div>
+<div class="px-4 py-2 bg-lichtgrijs rounded-xl border border-slate-200 text-center mx-2">
+<span id="dash-score" class="text-2xl font-bold tracking-tight text-slate-900">0 - 0</span>
+</div>
+<div class="text-center flex-1">
+<h3 id="dash-team-away" class="font-bold text-sm truncate text-slate-600">Tegenstander</h3>
+<p class="text-[11px] text-slate-500">Uit</p>
+</div>
+</div>
+<button id="dash-start-match-btn" class="w-full py-3.5 px-5 rounded-xl bg-oranje hover:bg-oranje/90 text-white font-bold text-sm shadow-md transition flex items-center justify-center space-x-2">
+<span>▶ Start / Open Live Wedstrijd</span>
+</button>
+</div>
+
+<h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Modules</h2>
+<div class="grid grid-cols-2 gap-3">
+<div data-target-tab="setup" class="mod-tile bg-white p-4 rounded-2xl border border-slate-200/85 hover:border-oranje/50 transition cursor-pointer flex flex-col justify-between shadow-sm group">
+<div class="w-9 h-9 rounded-xl bg-lichtgrijs text-staalblauw flex items-center justify-center text-base mb-3 group-hover:bg-oranje group-hover:text-white transition">⚙️</div>
+<div>
+<h3 class="font-bold text-sm text-slate-900">Voorbereiding</h3>
+<p class="text-xs text-slate-500 mt-0.5">Teams & opstelling</p>
+</div>
+</div>
+<div data-target-tab="past-matches" class="mod-tile bg-white p-4 rounded-2xl border border-slate-200/85 hover:border-oranje/50 transition cursor-pointer flex flex-col justify-between shadow-sm group">
+<div class="w-9 h-9 rounded-xl bg-lichtgrijs text-staalblauw flex items-center justify-center text-base mb-3 group-hover:bg-oranje group-hover:text-white transition">➕</div>
+<div>
+<h3 class="font-bold text-sm text-slate-900">Uitslagen Invoer</h3>
+<p class="text-xs text-slate-500 mt-0.5">Reeds gespeeld</p>
+</div>
+</div>
+<div data-target-tab="phases" class="mod-tile bg-white p-4 rounded-2xl border border-slate-200/85 hover:border-oranje/50 transition cursor-pointer flex flex-col justify-between shadow-sm group">
+<div class="w-9 h-9 rounded-xl bg-lichtgrijs text-staalblauw flex items-center justify-center text-base mb-3 group-hover:bg-oranje group-hover:text-white transition">📅</div>
+<div>
+<h3 class="font-bold text-sm text-slate-900">Fasebeheer</h3>
+<p class="text-xs text-slate-500 mt-0.5">Competitie & datums</p>
+</div>
+</div>
+<div data-target-tab="archive" class="mod-tile bg-white p-4 rounded-2xl border border-slate-200/85 hover:border-oranje/50 transition cursor-pointer flex flex-col justify-between shadow-sm group">
+<div class="w-9 h-9 rounded-xl bg-lichtgrijs text-staalblauw flex items-center justify-center text-base mb-3 group-hover:bg-oranje group-hover:text-white transition">📁</div>
+<div>
+<h3 class="font-bold text-sm text-slate-900">Verslagen</h3>
+<p class="text-xs text-slate-500 mt-0.5">Archief & WhatsApp</p>
+</div>
+</div>
+<div data-target-tab="analysis" class="mod-tile col-span-2 bg-white p-4 rounded-2xl border border-slate-200/85 hover:border-oranje/50 transition cursor-pointer flex items-center justify-between shadow-sm group">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-lichtgrijs text-staalblauw flex items-center justify-center text-base group-hover:bg-oranje group-hover:text-white transition">📊</div>
+<div>
+<h3 class="font-bold text-sm text-slate-900">Seizoensanalyse & Stats</h3>
+<p class="text-xs text-slate-500">Bekijk saldo, winst/verlies & speeltijden</p>
+</div>
+</div>
+<span class="text-slate-400 font-bold">→</span>
+</div>
+</div>
+</div>
+
+<!-- VOORBEREIDING -->
+<div id="view-setup" class="space-y-4 hidden">
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<h2 class="font-bold text-sm text-slate-900 flex items-center space-x-2"><span>⚙️</span><span>Team & Wedstrijd Instellingen</span></h2>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Naam Eigen Team</label>
+<input type="text" id="input-team-home" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-oranje transition" value="Mijn Team JO11-1">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Naam Tegenstander</label>
+<input type="text" id="input-team-away" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-oranje transition" value="Tegenstander JO11">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Competitiefase</label>
+<select id="input-phase-select" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-oranje transition"></select>
+</div>
+</div>
+
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<h2 class="font-bold text-sm text-slate-900 flex items-center space-x-2"><span>⏱️</span><span>Wedstrijdstructuur (Minuten)</span></h2>
+<div class="grid grid-cols-2 gap-2">
+<button id="mode-halves-btn" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-oranje border-oranje text-white">2 Helften</button>
+<button id="mode-quarters-btn" class="py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-lichtgrijs border-slate-200 text-slate-700">4 Kwarten</button>
+</div>
+<div id="settings-halves-box">
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Duur per helft (minuten)</label>
+<select id="input-half-duration" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm">
+<option value="1">1 minuut (Test)</option>
+<option value="15">15 minuten</option>
+<option value="20" selected>20 minuten</option>
+<option value="25">25 minuten</option>
+<option value="30">30 minuten</option>
+</select>
+</div>
+<div id="settings-quarters-box" class="hidden">
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Duur per kwart (minuten)</label>
+<select id="input-quarter-duration" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm">
+<option value="1">1 minuut (Test)</option>
+<option value="10">10 minuten</option>
+<option value="12" selected>12 minuten</option>
+<option value="15">15 minuten</option>
+</select>
+</div>
+</div>
+
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="font-bold text-sm text-slate-900 flex items-center space-x-2"><span>👥</span><span>Spelersselectie</span></h2>
+<span id="player-count-badge" class="text-xs bg-lichtgrijs text-slate-600 px-2.5 py-1 rounded-full font-semibold">0 spelers</span>
+</div>
+<div class="flex space-x-2">
+<input type="text" id="new-player-name" placeholder="Naam speler..." class="flex-1 bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-oranje">
+<button id="add-player-btn" class="bg-staalblauw hover:bg-staalblauw/90 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">Voeg toe</button>
+</div>
+<div id="players-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+</div>
+</div>
+
+<!-- UITSLAGEN INVOER -->
+<div id="view-past-matches" class="space-y-4 hidden">
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<h2 class="font-bold text-sm text-slate-900 flex items-center space-x-2"><span>➕</span><span>Reeds gespeelde wedstrijd toevoegen</span></h2>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Competitiefase</label>
+<select id="past-phase-select" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-oranje transition"></select>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Eigen Team</label>
+<input type="text" id="past-team-home" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm" value="Mijn Team JO11-1">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tegenstander</label>
+<input type="text" id="past-team-away" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm" placeholder="Naam tegenstander">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Goals Eigen</label>
+<input type="number" id="past-score-home" min="0" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm font-bold" value="0">
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Goals Tegen</label>
+<input type="number" id="past-score-away" min="0" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm font-bold" value="0">
+</div>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Datum</label>
+<input type="date" id="past-date" class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-sm">
+</div>
+<button id="save-past-match-btn" class="w-full py-3.5 px-5 rounded-xl bg-staalblauw hover:bg-staalblauw/90 text-white font-bold text-sm shadow-md transition">💾 Opslaan in Archief</button>
+</div>
+</div>
+
+<!-- LIVE WEDSTRIJD -->
+<div id="view-match" class="space-y-4 hidden">
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<span id="live-phase-badge" class="px-2.5 py-0.5 rounded-full bg-oranje/10 text-oranje text-xs font-bold uppercase">Fase 1</span>
+<span id="live-period-badge" class="px-2.5 py-0.5 rounded-full bg-staalblauw/10 text-staalblauw text-xs font-bold">Helft 1</span>
+</div>
+<button id="timer-state-btn" class="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 text-xs font-bold flex items-center space-x-1">
+<span id="timer-state-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span id="timer-state-label">LOPEND</span>
+</button>
+</div>
+
+<div class="grid grid-cols-7 gap-2 items-center text-center my-2">
+<div class="col-span-3">
+<h4 id="live-team-home-name" class="font-bold text-xs text-slate-700 truncate">Mijn Team</h4>
+<div id="live-score-home" class="text-3xl font-bold text-oranje mt-1">0</div>
+</div>
+<div class="col-span-1 text-slate-400 font-bold text-lg">-</div>
+<div class="col-span-3">
+<h4 id="live-team-away-name" class="font-bold text-xs text-slate-500 truncate">Tegenstander</h4>
+<div id="live-score-away" class="text-3xl font-bold text-slate-600 mt-1">0</div>
+</div>
+</div>
+
+<div class="bg-lichtgrijs border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+<div>
+<p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Speeltijd (min)</p>
+<p id="live-timer-display" class="text-xl font-bold tracking-tight text-slate-900 mt-0.5">0 / 20 min</p>
+</div>
+<div class="flex items-center space-x-1.5">
+<button id="time-minus-btn" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">-1m</button>
+<button id="time-plus-btn" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">+1m</button>
+<button id="timeout-btn" class="px-3 h-8 rounded-lg bg-amber-500/10 text-amber-700 font-bold text-xs flex items-center justify-center">Fluit</button>
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-2">
+<button id="next-period-btn" class="py-2.5 px-3 rounded-xl bg-staalblauw/10 text-staalblauw hover:bg-staalblauw/20 font-bold text-xs transition">⏭ Volgende periode</button>
+<button id="finish-match-btn" class="py-2.5 px-3 rounded-xl bg-groen text-white hover:bg-groen/90 font-bold text-xs transition">🏁 Afronden & Opslaan</button>
+</div>
+</div>
+
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="font-bold text-sm text-slate-900">Veld & Bank Bezetting</h2>
+<div class="flex space-x-1 bg-lichtgrijs p-1 rounded-xl border border-slate-200">
+<button id="mode-field-tab" class="px-3 py-1 rounded-lg text-xs font-bold bg-oranje text-white transition">Veld</button>
+<button id="mode-bench-tab" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-600 transition">Bank</button>
+</div>
+</div>
+<div id="live-players-grid" class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1"></div>
+
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-600">Goal Tegenstander:</span>
+<div class="flex items-center space-x-2">
+<button id="away-minus-btn" class="w-8 h-8 rounded-xl bg-lichtgrijs border border-slate-200 font-bold text-slate-700">-</button>
+<span id="away-goal-counter" class="text-sm font-bold w-6 text-center text-slate-900">0</span>
+<button id="away-plus-btn" class="w-8 h-8 rounded-xl bg-rose-500 font-bold text-white">+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- FASEBEHEER -->
+<div id="view-phases" class="space-y-4 hidden">
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<h2 class="font-bold text-sm text-slate-900 flex items-center space-x-2"><span>📅</span><span>Competitiefases Beheren</span></h2>
+<div class="space-y-3 pt-1">
+<input type="text" id="new-phase-name" placeholder="Fase naam (bijv. Fase 2)..." class="w-full bg-lichtgrijs border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-oranje">
+<button id="create-phase-btn" class="w-full py-3 bg-staalblauw hover:bg-staalblauw/90 text-white font-bold rounded-xl text-sm transition">Fase Toevoegen</button>
+</div>
+</div>
+<div class="space-y-3" id="phases-list-container"></div>
+</div>
+
+<!-- ARCHIEF -->
+<div id="view-archive" class="space-y-4 hidden">
+<div class="flex items-center justify-between px-1">
+<h2 class="font-bold text-base text-slate-900">Wedstrijdarchief</h2>
+<select id="archive-phase-filter" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-700 shadow-sm">
+<option value="all">Alle fases</option>
+</select>
+</div>
+<div id="archive-list-container" class="space-y-3"></div>
+</div>
+
+<!-- ANALYSE -->
+<div id="view-analysis" class="space-y-4 hidden">
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="font-bold text-sm text-slate-900">Seizoensanalyse</h2>
+<select id="analysis-phase-select" class="bg-lichtgrijs border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-700">
+<option value="all">Hele Seizoen</option>
+</select>
+</div>
+<div class="grid grid-cols-3 gap-2 text-center">
+<div class="bg-lichtgrijs p-3 rounded-xl border border-slate-200/60">
+<p class="text-[11px] text-slate-500">Gespeeld</p>
+<p id="stat-played" class="text-lg font-bold text-slate-900 mt-1">0</p>
+</div>
+<div class="bg-lichtgrijs p-3 rounded-xl border border-slate-200/60">
+<p class="text-[11px] text-slate-500">W - G - V</p>
+<p id="stat-wgv" class="text-sm font-bold text-staalblauw mt-1">0-0-0</p>
+</div>
+<div class="bg-lichtgrijs p-3 rounded-xl border border-slate-200/60">
+<p class="text-[11px] text-slate-500">Doelsaldo</p>
+<p id="stat-saldo" class="text-lg font-bold text-emerald-600 mt-1">+0</p>
+</div>
+</div>
+</div>
+<div class="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm space-y-3">
+<h3 class="font-bold text-sm text-slate-900">Spelersstatistieken</h3>
+<div id="analysis-players-container" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+</div>
+</div>
+
+</main>
+
+<!-- Snackbar -->
+<div id="undo-snackbar" class="fixed bottom-20 left-4 right-4 max-w-md mx-auto bg-groen text-white p-3 rounded-2xl shadow-xl flex items-center justify-between z-50 transform translate-y-24 opacity-0 transition-all duration-300 border border-white/10 pointer-events-none">
+<div class="flex items-center space-x-2 truncate pr-2">
+<span class="text-oranje font-bold">●</span>
+<span id="undo-text" class="text-xs text-slate-100 font-medium truncate">Actie uitgevoerd</span>
+</div>
+<button id="undo-action-btn" class="px-3 py-1 bg-oranje hover:bg-oranje/90 text-white rounded-xl text-xs font-bold transition shrink-0">Sluiten</button>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 max-w-md mx-auto px-4 py-2 flex items-center justify-around shadow-lg">
+<button data-nav-tab="dashboard" class="nav-btn flex flex-col items-center py-1 px-3 rounded-xl text-oranje font-bold transition"><span class="text-base">🏠</span><span class="text-[10px] mt-0.5">Home</span></button>
+<button data-nav-tab="setup" class="nav-btn flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-600 transition"><span class="text-base">⚙️</span><span class="text-[10px] font-medium mt-0.5">Team</span></button>
+<button data-nav-tab="match" class="nav-btn flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-600 transition relative"><span class="text-base">⏱️</span><span class="text-[10px] font-medium mt-0.5">Live</span></button>
+<button data-nav-tab="archive" class="nav-btn flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-600 transition"><span class="text-base">📁</span><span class="text-[10px] font-medium mt-0.5">Verslagen</span></button>
+<button data-nav-tab="analysis" class="nav-btn flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-600 transition"><span class="text-base">📊</span><span class="text-[10px] font-medium mt-0.5">Analyse</span></button>
+</nav>
+
+<script>
+let structureMode = 'halves';
+let teamHome = 'Mijn Team JO11-1';
+let teamAway = 'Tegenstander JO11';
+let players = [
+{ id: '1', name: 'Daan (K)', onField: true, goals: 0, totalMinutes: 0 },
+{ id: '2', name: 'Lucas', onField: true, goals: 0, totalMinutes: 0 },
+{ id: '3', name: 'Finn', onField: true, goals: 0, totalMinutes: 0 },
+{ id: '4', name: 'Noah', onField: true, goals: 0, totalMinutes: 0 },
+{ id: '5', name: 'Sem', onField: true, goals: 0, totalMinutes: 0 },
+{ id: '6', name: 'Milan', onField: false, goals: 0, totalMinutes: 0 }
+ ];
+let phases = [{ id: 'p1', name: 'Fase 1 · Najaar' }];
+let activePhaseId = 'p1';
+
+let matchRunning = false, matchPaused = false, currentPeriod = 1, periodElapsedSeconds = 0, periodDurationSeconds = 1200;
+let homeGoals = 0, awayGoals = 0, audioMuted = false, lineupMode = 'field';
+let audioCtx = null, silentAudioEl = null;
+let matchArchive = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+loadLocalStorage();
+initAudio();
+setupEventListeners();
+updatePhaseSelects();
+renderPlayersList();
+renderDashboard();
+renderPhasesList();
+renderArchive();
+renderAnalysis();
+setInterval(timerTick, 1000);
+});
+
+function initAudio() {
+try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+try {
+silentAudioEl = document.createElement('audio');
+silentAudioEl.loop = true;
+silentAudioEl.setAttribute('playsinline', '');
+silentAudioEl.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+} catch(e) {}
+}
+
+function playWhistle() {
+if (audioMuted || !audioCtx) return;
+try {
+if (audioCtx.state === 'suspended') audioCtx.resume();
+let now = audioCtx.currentTime;
+for (let i = 0; i < 3; i++) {
+let osc = audioCtx.createOscillator();
+let gain = audioCtx.createGain();
+osc.type = 'sine';
+osc.frequency.setValueAtTime(2400, now + (i * 0.18));
+gain.gain.setValueAtTime(0.15, now + (i * 0.18));
+gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.18) + 0.12);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start(now + (i * 0.18));
+osc.stop(now + (i * 0.18) + 0.12);
+}
+if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+} catch(e) {}
+}
+
+function setupEventListeners() {
+const get = id => document.getElementById(id);
+
+if (get('header-brand-btn')) get('header-brand-btn').addEventListener('click', () => switchTab('dashboard'));
+if (get('mute-btn')) get('mute-btn').addEventListener('click', toggleAudioMute);
+if (get('dash-start-match-btn')) get('dash-start-match-btn').addEventListener('click', startOrOpenMatch);
+
+document.querySelectorAll('.mod-tile').forEach(tile => {
+tile.addEventListener('click', () => {
+let tab = tile.getAttribute('data-target-tab');
+if (tab) switchTab(tab);
+});
+});
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+let tab = btn.getAttribute('data-nav-tab');
+if (tab) switchTab(tab);
+});
+});
+
+if (get('input-team-home')) get('input-team-home').addEventListener('input', (e) => { teamHome = e.target.value; renderDashboard(); });
+if (get('input-team-away')) get('input-team-away').addEventListener('input', (e) => { teamAway = e.target.value; renderDashboard(); });
+if (get('input-phase-select')) get('input-phase-select').addEventListener('change', (e) => { activePhaseId = e.target.value; renderDashboard(); });
+
+if (get('mode-halves-btn')) get('mode-halves-btn').addEventListener('click', () => setStructureMode('halves'));
+if (get('mode-quarters-btn')) get('mode-quarters-btn').addEventListener('click', () => setStructureMode('quarters'));
+
+if (get('add-player-btn')) get('add-player-btn').addEventListener('click', addPlayer);
+if (get('timer-state-btn')) get('timer-state-btn').addEventListener('click', toggleTimer);
+if (get('time-minus-btn')) get('time-minus-btn').addEventListener('click', () => adjustTime(-1));
+if (get('time-plus-btn')) get('time-plus-btn').addEventListener('click', () => adjustTime(1));
+if (get('timeout-btn')) get('timeout-btn').addEventListener('click', triggerTimeout);
+if (get('next-period-btn')) get('next-period-btn').addEventListener('click', advancePeriod);
+if (get('finish-match-btn')) get('finish-match-btn').addEventListener('click', finishAndSaveMatch);
+
+if (get('mode-field-tab')) get('mode-field-tab').addEventListener('click', () => changeLineupMode('field'));
+if (get('mode-bench-tab')) get('mode-bench-tab').addEventListener('click', () => changeLineupMode('bench'));
+if (get('away-minus-btn')) get('away-minus-btn').addEventListener('click', () => addAwayGoal(-1));
+if (get('away-plus-btn')) get('away-plus-btn').addEventListener('click', () => addAwayGoal(1));
+
+if (get('create-phase-btn')) get('create-phase-btn').addEventListener('click', createNewPhase);
+if (get('save-past-match-btn')) get('save-past-match-btn').addEventListener('click', savePastMatch);
+if (get('archive-phase-filter')) get('archive-phase-filter').addEventListener('change', renderArchive);
+if (get('analysis-phase-select')) get('analysis-phase-select').addEventListener('change', renderAnalysis);
+}
+
+function toggleAudioMute() {
+audioMuted = !audioMuted;
+let icon = document.getElementById('mute-icon');
+if (icon) icon.textContent = audioMuted ? '🔕' : '🔔';
+showSnackbar(audioMuted ? 'Geluid uit' : 'Geluid aan');
+}
+
+function switchTab(tabId) {
+['dashboard', 'setup', 'past-matches', 'match', 'phases', 'archive', 'analysis'].forEach(t => {
+let el = document.getElementById('view-' + t);
+if (el) el.classList.add('hidden');
+});
+let target = document.getElementById('view-' + tabId);
+if (target) target.classList.remove('hidden');
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+let tab = btn.getAttribute('data-nav-tab');
+if (tab === tabId) {
+btn.classList.remove('text-slate-400');
+btn.classList.add('text-oranje', 'font-bold');
+} else {
+btn.classList.remove('text-oranje', 'font-bold');
+btn.classList.add('text-slate-400');
+}
+});
+window.scrollTo({ top: 0, behavior: 'smooth' });
+if (tabId === 'match') renderLiveMatchUI();
+if (tabId === 'archive') renderArchive();
+if (tabId === 'analysis') renderAnalysis();
+}
+
+function startOrOpenMatch() {
+let hIn = document.getElementById('input-team-home');
+let aIn = document.getElementById('input-team-away');
+if (hIn) teamHome = hIn.value || 'Mijn Team';
+if (aIn) teamAway = aIn.value || 'Tegenstander';
+
+if (!matchRunning) {
+matchRunning = true;
+matchPaused = false;
+periodElapsedSeconds = 0;
+setPeriodDuration();
+if (silentAudioEl) silentAudioEl.play().catch(() => {});
+showSnackbar('Wedstrijd gestart!');
+}
+switchTab('match');
+}
+
+function setPeriodDuration() {
+let sel = structureMode === 'halves' ? document.getElementById('input-half-duration') : document.getElementById('input-quarter-duration');
+let val = sel ? sel.value : '20';
+periodDurationSeconds = parseInt(val, 10) * 60;
+}
+
+function setStructureMode(mode) {
+structureMode = mode;
+let hBtn = document.getElementById('mode-halves-btn');
+let qBtn = document.getElementById('mode-quarters-btn');
+let hBox = document.getElementById('settings-halves-box');
+let qBox = document.getElementById('settings-quarters-box');
+
+if (!hBtn || !qBtn) return;
+if (mode === 'halves') {
+hBtn.className = 'py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-oranje border-oranje text-white';
+qBtn.className = 'py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-lichtgrijs border-slate-200 text-slate-700';
+if (hBox) hBox.classList.remove('hidden');
+if (qBox) qBox.classList.add('hidden');
+} else {
+qBtn.className = 'py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-oranje border-oranje text-white';
+hBtn.className = 'py-2.5 px-3 rounded-xl border text-xs font-bold transition bg-lichtgrijs border-slate-200 text-slate-700';
+if (qBox) qBox.classList.remove('hidden');
+if (hBox) hBox.classList.add('hidden');
+}
+setPeriodDuration();
+}
+
+function timerTick() {
+if (!matchRunning || matchPaused) return;
+periodElapsedSeconds++;
+if (periodElapsedSeconds % 60 === 0) {
+players.forEach(p => { if (p.onField) p.totalMinutes += 1; });
+}
+if (periodElapsedSeconds >= periodDurationSeconds) {
+playWhistle();
+matchPaused = true;
+showSnackbar('Periode afgelopen!');
+}
+renderLiveMatchUI();
+}
+
+function toggleTimer() {
+if (!matchRunning) { startOrOpenMatch(); return; }
+matchPaused = !matchPaused;
+renderLiveMatchUI();
+}
+
+function adjustTime(min) {
+periodElapsedSeconds += (min * 60);
+if (periodElapsedSeconds < 0) periodElapsedSeconds = 0;
+renderLiveMatchUI();
+}
+
+function advancePeriod() {
+let maxP = structureMode === 'halves' ? 2 : 4;
+if (currentPeriod >= maxP) {
+showSnackbar('Laatste periode bereikt');
+return;
+}
+currentPeriod++;
+periodElapsedSeconds = 0;
+matchPaused = true;
+playWhistle();
+renderLiveMatchUI();
+showSnackbar(Start periode ${currentPeriod}`);
+}
+
+function finishAndSaveMatch() {
+matchArchive.unshift({
+id: 'm_' + Date.now(),
+date: new Date().toLocaleDateString('nl-NL'),
+phaseId: activePhaseId,
+teamHome,
+teamAway,
+homeGoals,
+awayGoals,
+type: 'live'
+});
+localStorage.setItem('veldmeester_archive', JSON.stringify(matchArchive));
+matchRunning = false;
+renderDashboard();
+renderArchive();
+renderAnalysis();
+playWhistle();
+showSnackbar('Wedstrijd opgeslagen!');
+switchTab('archive');
+}
+
+function triggerTimeout() {
+playWhistle();
+showSnackbar('Fluitsignaal gegeven');
+}
+
+function renderDashboard() {
+let dH = document.getElementById('dash-team-home');
+let dA = document.getElementById('dash-team-away');
+let dS = document.getElementById('dash-score');
+let dP = document.getElementById('dash-phase-name');
+let hP = document.getElementById('header-phase-badge');
+let dSt = document.getElementById('dash-match-status-text');
+
+if (dH) dH.textContent = teamHome;
+if (dA) dA.textContent = teamAway;
+if (dS) dS.textContent = ``${homeGoals} - ${awayGoals};
+let phaseObj = phases.find(p => p.id === activePhaseId);
+if (phaseObj) {
+if (dP) dP.textContent = phaseObj.name;
+if (hP) hP.textContent = phaseObj.name;
+}
+if (dSt) dSt.textContent = matchRunning ? (matchPaused ? 'Gepauzeerd' : 'Bezig') : 'Klaar voor aftrap';
+}
+
+function renderLiveMatchUI() {
+let lH = document.getElementById('live-team-home-name');
+let lA = document.getElementById('live-team-away-name');
+let sH = document.getElementById('live-score-home');
+let sA = document.getElementById('live-score-away');
+let aC = document.getElementById('away-goal-counter');
+let tDisp = document.getElementById('live-timer-display');
+
+if (lH) lH.textContent = teamHome;
+if (lA) lA.textContent = teamAway;
+if (sH) sH.textContent = homeGoals;
+if (sA) sA.textContent = awayGoals;
+if (aC) aC.textContent = awayGoals;
+
+let mins = Math.floor(periodElapsedSeconds / 60);
+let secs = periodElapsedSeconds % 60;
+if (tDisp) tDisp.textContent = ``${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')};
+renderLivePlayersGrid();
+renderDashboard();
+}
+
+function changeLineupMode(mode) {
+lineupMode = mode;
+let fTab = document.getElementById('mode-field-tab');
+let bTab = document.getElementById('mode-bench-tab');
+if (!fTab || !bTab) return;
+if (mode === 'field') {
+fTab.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-oranje text-white transition';
+bTab.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+} else {
+bTab.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-oranje text-white transition';
+fTab.className = 'px-3 py-1 rounded-lg text-xs font-bold text-slate-600 transition';
+}
+renderLivePlayersGrid();
+}
+
+function renderLivePlayersGrid() {
+let container = document.getElementById('live-players-grid');
+if (!container) return;
+container.innerHTML = '';
+let filtered = players.filter(p => lineupMode === 'field' ? p.onField : !p.onField);
+
+if (filtered.length === 0) {
+container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Geen spelers gevonden.</p>';
+return;
+}
+
+filtered.forEach(p => {
+let card = document.createElement('div');
+card.className = "p-3 rounded-xl bg-lichtgrijs border border-slate-200/85 flex items-center justify-between";
+card.innerHTML = <div&gt;&lt;h4 class='font-bold text-xs text-slate-900'&gt;${p.name}</h4><p class='text-[10px] text-slate-500'>⚽ {p.totalMinutes}m</p></div>`;
+
+let btnBox = document.createElement('div');
+btnBox.className = "flex space-x-1.5";
+if (lineupMode === 'field') {
+let gBtn = document.createElement('button');
+gBtn.className = "px-2.5 py-1 bg-oranje text-white text-[11px] rounded-lg font-bold shadow-sm";
+gBtn.textContent = "Goal";
+gBtn.addEventListener('click', () => { p.goals++; homeGoals++; playWhistle(); renderLiveMatchUI(); showSnackbar(Goal van ${p.name}!`); });
+
+let sBtn = document.createElement('button');
+sBtn.className = "px-2 py-1 bg-slate-200 text-slate-700 text-[11px] rounded-lg font-bold";
+sBtn.textContent = "Wissel";
+sBtn.addEventListener('click', () => { p.onField = false; renderLiveMatchUI(); showSnackbar(``${p.name} naar bank`); });
+
+btnBox.appendChild(gBtn);
+btnBox.appendChild(sBtn);
+} else {
+let iBtn = document.createElement('button');
+iBtn.className = "px-3 py-1 bg-staalblauw text-white text-[11px] rounded-lg font-bold shadow-sm";
+iBtn.textContent = "In veld";
+iBtn.addEventListener('click', () => { p.onField = true; renderLiveMatchUI(); showSnackbar(${p.name} in veld`); });
+btnBox.appendChild(iBtn);
+}
+card.appendChild(btnBox);
+container.appendChild(card);
+});
+}
+
+function addAwayGoal(val) {
+awayGoals += val;
+if (awayGoals < 0) awayGoals = 0;
+renderLiveMatchUI();
+}
+
+function renderPlayersList() {
+let container = document.getElementById('players-list-container');
+let badge = document.getElementById('player-count-badge');
+if (!container) return;
+container.innerHTML = '';
+if (badge) badge.textContent = ``${players.length} spelers`;
+
+players.forEach(p => {
+let div = document.createElement('div');
+div.className = "flex items-center justify-between p-2.5 rounded-xl bg-lichtgrijs border border-slate-200/85";
+div.innerHTML = <span class='font-bold text-xs text-slate-900'&gt;${p.name}</span>`;
+let dBtn = document.createElement('button');
+dBtn.className = "text-xs text-rose-600 font-semibold px-2 py-1";
+dBtn.textContent = "Verwijder";
+dBtn.addEventListener('click', () => { players = players.filter(x => x.id !== p.id); renderPlayersList(); });
+div.appendChild(dBtn);
+container.appendChild(div);
+});
+}
+
+function addPlayer() {
+let input = document.getElementById('new-player-name');
+if (!input) return;
+let name = input.value.trim();
+if (!name) return;
+players.push({ id: Date.now().toString(), name, onField: false, goals: 0, totalMinutes: 0 });
+input.value = '';
+renderPlayersList();
+showSnackbar('Speler toegevoegd');
+}
+
+function renderPhasesList() {
+let container = document.getElementById('phases-list-container');
+if (!container) return;
+container.innerHTML = '';
+phases.forEach(ph => {
+let div = document.createElement('div');
+div.className = "bg-white border border-slate-200/85 rounded-xl p-3.5 flex items-center justify-between shadow-sm";
+div.innerHTML = <h4 class='font-bold text-xs text-slate-900'&gt;${ph.name}</h4>`;
+container.appendChild(div);
+});
+}
+
+function createNewPhase() {
+let input = document.getElementById('new-phase-name');
+if (!input) return;
+let name = input.value.trim();
+if (!name) return;
+phases.push({ id: 'p_' + Date.now(), name });
+input.value = '';
+updatePhaseSelects();
+renderPhasesList();
+showSnackbar('Fase toegevoegd');
+}
+
+function updatePhaseSelects() {
+['input-phase-select', 'past-phase-select', 'archive-phase-filter', 'analysis-phase-select'].forEach(id => {
+let sel = document.getElementById(id);
+if (!sel) return;
+let keepAll = id !== 'input-phase-select' && id !== 'past-phase-select';
+sel.innerHTML = keepAll ? '<option value="all">Alle fases</option>' : '';
+phases.forEach(ph => {
+let opt = document.createElement('option');
+opt.value = ph.id;
+opt.textContent = ph.name;
+sel.appendChild(opt);
+});
+});
+}
+
+function savePastMatch() {
+let phaseId = document.getElementById('past-phase-select').value;
+let tHome = document.getElementById('past-team-home').value || 'Mijn Team';
+let tAway = document.getElementById('past-team-away').value || 'Tegenstander';
+let sHome = parseInt(document.getElementById('past-score-home').value) || 0;
+let sAway = parseInt(document.getElementById('past-score-away').value) || 0;
+let dateVal = document.getElementById('past-date').value;
+let formattedDate = dateVal ? new Date(dateVal).toLocaleDateString('nl-NL') : new Date().toLocaleDateString('nl-NL');
+
+matchArchive.push({
+id: 'm_past_' + Date.now(),
+date: formattedDate,
+phaseId: phaseId,
+teamHome: tHome,
+teamAway: tAway,
+homeGoals: sHome,
+awayGoals: sAway,
+type: 'past'
+});
+
+localStorage.setItem('veldmeester_archive', JSON.stringify(matchArchive));
+showSnackbar('Uitslag opgeslagen!');
+switchTab('archive');
+}
+
+function renderArchive() {
+let container = document.getElementById('archive-list-container');
+let filterEl = document.getElementById('archive-phase-filter');
+if (!container) return;
+let filter = filterEl ? filterEl.value : 'all';
+let filtered = filter === 'all' ? matchArchive : matchArchive.filter(m => m.phaseId === filter);
+
+container.innerHTML = filtered.length === 0 ? '<div class="text-center py-10 text-slate-400 text-xs">Geen wedstrijdverslagen of uitslagen gevonden</div>' : '';
+
+filtered.forEach(m => {
+let card = document.createElement('div');
+card.className = "bg-white border border-slate-200/85 rounded-2xl p-4 shadow-sm space-y-2";
+card.innerHTML = &lt;div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold"&gt; &lt;span&gt;${m.date} · ${m.type === 'past' ? 'Ingevoerd' : 'Live'}&lt;/span&gt; &lt;/div&gt; &lt;div class="flex items-center justify-between font-bold text-sm text-slate-900"&gt; &lt;span&gt;${m.teamHome}</span>
+<span class="text-oranje">${m.homeGoals} - ${m.awayGoals}</span>
+<span>${m.teamAway}&lt;/span&gt; &lt;/div&gt;;
+container.appendChild(card);
+});
+}
+
+function renderAnalysis() {
+let sel = document.getElementById('analysis-phase-select');
+let filter = sel ? sel.value : 'all';
+let filtered = filter === 'all' ? matchArchive : matchArchive.filter(m => m.phaseId === filter);
+
+let played = filtered.length;
+let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
+
+filtered.forEach(m => {
+goalsFor += m.homeGoals;
+goalsAgainst += m.awayGoals;
+if (m.homeGoals > m.awayGoals) wins++;
+else if (m.homeGoals === m.awayGoals) draws++;
+else losses++;
+});
+
+let saldo = goalsFor - goalsAgainst;
+if (document.getElementById('stat-played')) document.getElementById('stat-played').textContent = played;
+if (document.getElementById('stat-wgv')) document.getElementById('stat-wgv').textContent = ${wins}-${draws}-${losses}`;
+if (document.getElementById('stat-saldo')) document.getElementById('stat-saldo').textContent = (saldo > 0 ? '+' : '') + saldo;
+
+let pContainer = document.getElementById('analysis-players-container');
+if (!pContainer) return;
+pContainer.innerHTML = '';
+players.forEach(p => {
+let row = document.createElement('div');
+row.className = "flex items-center justify-between p-2.5 rounded-xl bg-lichtgrijs border border-slate-200/85 text-xs";
+row.innerHTML = <span class="font-bold text-slate-900"&gt;${p.name}</span><span class="text-slate-600">⏱️ ${p.totalMinutes} min</span>`;
+pContainer.appendChild(row);
+});
+}
+
+function showSnackbar(text) {
+let sb = document.getElementById('undo-snackbar');
+let txt = document.getElementById('undo-text');
+if (!sb || !txt) return;
+txt.textContent = text;
+sb.classList.remove('translate-y-24', 'opacity-0');
+setTimeout(() => sb.classList.add('translate-y-24', 'opacity-0'), 3000);
+}
+
+function loadLocalStorage() {
+let saved = localStorage.getItem('veldmeester_archive');
+if (saved) { try { matchArchive = JSON.parse(saved); } catch(e) {} }
+}
+</script>
+</body>
+</html>
